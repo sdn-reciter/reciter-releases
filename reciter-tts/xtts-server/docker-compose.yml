@@ -1,0 +1,66 @@
+services:
+  xtts-v2:
+    build: .
+    container_name: xtts-v2
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      # ── Безопасность ────────────────────────────────────────────────────
+      # Задайте длинный случайный ключ (например: openssl rand -hex 32).
+      # Приложение пришлёт его в заголовке Authorization: Bearer <key>.
+      # Пусто = без авторизации, допустимо ТОЛЬКО в изолированной Wi-Fi-сети.
+      - API_KEY=${XTTS_API_KEY:-}
+      # Каталог с эталонными голосами (.wav) для клонирования. Приложение
+      # загружает/выбирает/удаляет их через /voices. Имя голоса по умолчанию:
+      - VOICES_DIR=/app/voices
+      - DEFAULT_SPEAKER=default
+      # Ударения (RUAccent). Нужен pip install ruaccent в Dockerfile (см. доку).
+      - USE_RUACCENT=1
+      - MAX_TEXT_CHARS=5000
+      # ── Ударения: форматы ────────────────────────────────────────────────
+      # /accent для внешних движков (Edge/Google понимают U+0301):
+      - XTTS_STRESS_MODE=${XTTS_STRESS_MODE:-mark}
+      # вход САМОЙ XTTS: strip (базовая модель ударений не понимает) |
+      # plus (для русских файнтюнов типа xttsv2_banana, вместе с XTTS_MODEL_DIR)
+      - XTTS_SYNTH_STRESS=${XTTS_SYNTH_STRESS:-strip}
+      # Кастомная модель XTTS (файнтюн): положи model.pth/config.json/vocab.json
+      # в ./model и поставь XTTS_MODEL_DIR=/app/model в .env.
+      - XTTS_MODEL_DIR=${XTTS_MODEL_DIR:-}
+      # ── Анти-артефакты (см. self-hosted-server.md §5a) ───────────────────
+      - XTTS_REPETITION_PENALTY=${XTTS_REPETITION_PENALTY:-6.0}
+      - XTTS_TEMPERATURE=${XTTS_TEMPERATURE:-0.7}
+      - XTTS_TOP_K=${XTTS_TOP_K:-50}
+      - XTTS_TOP_P=${XTTS_TOP_P:-0.85}
+      - XTTS_LENGTH_PENALTY=${XTTS_LENGTH_PENALTY:-1.0}
+      - XTTS_TRIM_SILENCE=${XTTS_TRIM_SILENCE:-1}
+      - XTTS_TRIM_TAIL=${XTTS_TRIM_TAIL:-1}
+      - XTTS_SILENCE_DB=${XTTS_SILENCE_DB:--45}
+      - XTTS_TAIL_MIN_GAP_MS=${XTTS_TAIL_MIN_GAP_MS:-200}
+      - XTTS_TAIL_MAX_LEN_MS=${XTTS_TAIL_MAX_LEN_MS:-250}
+      - XTTS_FADE_MS=${XTTS_FADE_MS:-12}
+      - XTTS_SENT_PAUSE_MS=${XTTS_SENT_PAUSE_MS:-250}
+    volumes:
+      # Каталог голосов монтируется на запись — приложение загружает сюда новые
+      # эталоны через /voices/upload, они переживают пересборку контейнера.
+      - ./voices:/app/voices
+      # Каталог для кастомной модели (файнтюна) — см. XTTS_MODEL_DIR выше.
+      - ./model:/app/model
+      # Веса XTTS: качаются при ПЕРВОМ старте сюда (TTS_HOME=/cache/tts в
+      # образе) и переживают пересборки — образ остаётся тонким.
+      - ./cache:/cache
+    ports:
+      # По умолчанию порт открыт в ЛОКАЛЬНОЙ СЕТИ (0.0.0.0), чтобы телефон в той
+      # же Wi-Fi достучался до http://<IP-ПК>:8002 — это и есть первый сценарий
+      # («сначала тест по Wi-Fi»). Переопределить можно через .env:
+      #   XTTS_BIND=127.0.0.1   → только localhost (когда сервер за Caddy/VPN).
+      # ⚠️ Не пробрасывайте 8002 «в мир» на роутере без HTTPS и ключа —
+      #    для интернета используйте Tailscale/Caddy (см. self-hosted-server.md).
+      - "${XTTS_BIND:-0.0.0.0}:8002:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    restart: unless-stopped

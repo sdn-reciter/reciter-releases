@@ -1,0 +1,39 @@
+# Запуск с GPU. Fun-CosyVoice3-0.5B — на 8 ГБ VRAM живёт; на CPU медленно.
+services:
+  cosyvoice:
+    build:
+      context: .
+      args:
+        PREFETCH_MODEL: ${PREFETCH_MODEL:-1}
+    container_name: cosyvoice
+    restart: unless-stopped
+    environment:
+      - API_KEY=${COSYVOICE_API_KEY:-}
+      - DEVICE=${COSYVOICE_DEVICE:-auto}
+      - MODEL_DIR=/opt/models/Fun-CosyVoice3-0.5B
+      - DEFAULT_SPEAKER=${COSYVOICE_DEFAULT_SPEAKER:-}
+      - USE_RUACCENT=${USE_RUACCENT:-1}
+      - COSY_STRESS_MODE=${COSY_STRESS_MODE:-mark}
+      # CosyVoice метки не читает — strip единственно верно.
+      - COSY_SYNTH_STRESS=${COSY_SYNTH_STRESS:-strip}
+      - COSY_CHUNK_CHARS=${COSY_CHUNK_CHARS:-220}
+      - MAX_TEXT_CHARS=${MAX_TEXT_CHARS:-5000}
+      - HF_HOME=/opt/hf-cache
+      - HF_HUB_CACHE=/opt/hf-cache
+      - HF_HUB_OFFLINE=${COSYVOICE_OFFLINE:-1}
+      - TRANSFORMERS_OFFLINE=${COSYVOICE_OFFLINE:-1}
+    volumes:
+      # Эталоны голосов (.wav и т.п.) — ОБЯЗАТЕЛЬНЫ: CosyVoice3 клонирует по
+      # образцу, «встроенного» голоса у 0.5B нет.
+      - ./voices:/app/voices
+    ports:
+      # Порт 8007 снаружи — рядом с XTTS/Supertonic/VoxCPM/ESpeech/Chatterbox.
+      #   COSYVOICE_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      - "${COSYVOICE_BIND:-0.0.0.0}:8007:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

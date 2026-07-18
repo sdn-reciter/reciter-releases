@@ -1,0 +1,42 @@
+services:
+  supertonic:
+    build: .
+    container_name: supertonic
+    restart: unless-stopped
+    environment:
+      - API_KEY=${SUPERTONIC_API_KEY:-}
+      - DEFAULT_VOICE=${SUPERTONIC_DEFAULT_VOICE:-F1}
+      - USE_RUACCENT=${USE_RUACCENT:-1}
+      # Качество синтеза: 5–12 (больше = лучше и медленнее).
+      - SUPERTONIC_STEPS=${SUPERTONIC_STEPS:-8}
+      # Базовая скорость речи модели (скорость в приложении применяется поверх).
+      - SUPERTONIC_SPEED=${SUPERTONIC_SPEED:-1.0}
+      # Формат ответа /accent для приложения: mark (U+0301) | plus | strip.
+      - SUPERTONIC_STRESS_MODE=${SUPERTONIC_STRESS_MODE:-mark}
+      # Что скармливать самой модели: strip (по умолчанию — поддержка меток
+      # ударений у Supertonic не документирована) | mark | plus.
+      - SUPERTONIC_SYNTH_STRESS=${SUPERTONIC_SYNTH_STRESS:-strip}
+      # Устройство инференса: auto (GPU, если доступен) | gpu | cpu.
+      - SUPERTONIC_DEVICE=${SUPERTONIC_DEVICE:-auto}
+      - MAX_TEXT_CHARS=${MAX_TEXT_CHARS:-5000}
+      # Ассеты ЗАПЕЧЕНЫ в образ при сборке (PREFETCH_MODEL=1) — на старте
+      # скачивания нет; offline запрещает библиотеке ходить в HF Hub.
+      - HF_HOME=/opt/hf-cache
+      - HF_HUB_CACHE=/opt/hf-cache
+      - HF_HUB_OFFLINE=${SUPERTONIC_OFFLINE:-1}
+      - TRANSFORMERS_OFFLINE=${SUPERTONIC_OFFLINE:-1}
+    volumes:
+      # JSON-стили голосов из Voice Builder (supertone.ai).
+      - ./styles:/app/styles
+    ports:
+      # Порт 8003 снаружи — чтобы работать РЯДОМ с XTTS-сервером (8002) и
+      # переключаться в приложении простой сменой адреса.
+      #   SUPERTONIC_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      - "${SUPERTONIC_BIND:-0.0.0.0}:8003:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

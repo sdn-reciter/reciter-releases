@@ -1,0 +1,54 @@
+# Запуск с GPU (ESpeech лёгкий — на 8 ГБ живёт с запасом; на CPU тоже
+# работает, но медленнее реального времени).
+services:
+  espeech:
+    build:
+      context: .
+      args:
+        MODEL: ${ESPEECH_MODEL:-ESpeech/ESpeech-TTS-1_RL-V2}
+        PREFETCH_MODEL: ${PREFETCH_MODEL:-1}
+    container_name: espeech
+    restart: unless-stopped
+    environment:
+      - API_KEY=${ESPEECH_API_KEY:-}
+      - MODEL=${ESPEECH_MODEL:-ESpeech/ESpeech-TTS-1_RL-V2}
+      # auto: cuda при наличии, иначе CPU.
+      - DEVICE=${ESPEECH_DEVICE:-auto}
+      - DEFAULT_SPEAKER=${ESPEECH_DEFAULT_SPEAKER:-}
+      - USE_RUACCENT=${USE_RUACCENT:-1}
+      # Шаги ODE-солвера: 16 — быстрее, 32 — качество (по умолчанию).
+      - ESPEECH_NFE=${ESPEECH_NFE:-32}
+      - ESPEECH_CFG=${ESPEECH_CFG:-2.0}
+      - ESPEECH_SPEED=${ESPEECH_SPEED:-1.0}
+      # Формат ответа /accent для приложения: mark (U+0301) | plus | strip.
+      - ESPEECH_STRESS_MODE=${ESPEECH_STRESS_MODE:-mark}
+      # Что скармливать МОДЕЛИ: plus (по умолчанию — ESpeech обучен на «+»,
+      # ударения заметно улучшают русский) | mark | strip.
+      - ESPEECH_SYNTH_STRESS=${ESPEECH_SYNTH_STRESS:-plus}
+      # Референс длиннее REF_MAX_SEC режется (F5 рекомендует < 15 c).
+      - ESPEECH_REF_MAX_SEC=${ESPEECH_REF_MAX_SEC:-12}
+      - ESPEECH_SENT_PAUSE_MS=${ESPEECH_SENT_PAUSE_MS:-200}
+      - ESPEECH_CHUNK_CHARS=${ESPEECH_CHUNK_CHARS:-160}
+      - MAX_TEXT_CHARS=${MAX_TEXT_CHARS:-5000}
+      # Веса ЗАПЕЧЕНЫ в образ при сборке (PREFETCH_MODEL=1) и лежат в
+      # /opt/hf-cache — том для них не нужен, на старте скачивания нет.
+      - HF_HOME=/opt/hf-cache
+      - HF_HUB_CACHE=/opt/hf-cache
+      - HF_HUB_OFFLINE=${ESPEECH_OFFLINE:-1}
+      - TRANSFORMERS_OFFLINE=${ESPEECH_OFFLINE:-1}
+    volumes:
+      # Эталоны голосов (.wav [+ .txt транскрипт]) — как у XTTS/VoxCPM;
+      # транскрипты пишутся сюда же и переживают пересборку.
+      - ./voices:/app/voices
+    ports:
+      # Порт 8005 снаружи — рядом с XTTS (8002), Supertonic (8003),
+      # VoxCPM (8004); в приложении переключение сменой адреса/пресета.
+      #   ESPEECH_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      - "${ESPEECH_BIND:-0.0.0.0}:8005:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

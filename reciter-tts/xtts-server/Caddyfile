@@ -1,0 +1,28 @@
+# Caddy reverse proxy for the XTTS server — automatic HTTPS (Let's Encrypt).
+#
+# Prerequisites:
+#   • A domain name pointing at your home IP (or a DDNS hostname).
+#   • Router port-forward: external 443 → the machine running Caddy.
+#   • The XTTS container bound to 127.0.0.1:8002 (see docker-compose.yml).
+#
+# Replace tts.example.com with your hostname. Caddy fetches and renews the
+# TLS certificate on its own — the app then connects over HTTPS, so no
+# cleartext leaves your phone.
+#
+# Defence in depth: the app already sends Authorization: Bearer <API_KEY>,
+# and here we ALSO reject anything without it at the proxy, so unauthenticated
+# probes never even reach the GPU service.
+
+tts.example.com {
+	@noauth {
+		not header Authorization "Bearer YOUR_LONG_RANDOM_KEY"
+	}
+	respond @noauth "Unauthorized" 401
+
+	reverse_proxy 127.0.0.1:8002 {
+		# Model synthesis can take several seconds per paragraph.
+		transport http {
+			read_timeout 120s
+		}
+	}
+}

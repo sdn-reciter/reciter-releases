@@ -1,0 +1,48 @@
+# Запуск с GPU. Chatterbox ~0.5B — на 8 ГБ VRAM живёт; на CPU тоже работает,
+# но заметно медленнее реального времени.
+services:
+  chatterbox:
+    build:
+      context: .
+      args:
+        PREFETCH_MODEL: ${PREFETCH_MODEL:-1}
+    container_name: chatterbox
+    restart: unless-stopped
+    environment:
+      - API_KEY=${CHATTERBOX_API_KEY:-}
+      # auto: cuda при наличии, иначе CPU.
+      - DEVICE=${CHATTERBOX_DEVICE:-auto}
+      - LANGUAGE_ID=${CHATTERBOX_LANG:-ru}
+      - DEFAULT_SPEAKER=${CHATTERBOX_DEFAULT_SPEAKER:-}
+      # Экспрессия и сила следования тексту.
+      - CB_EXAGGERATION=${CB_EXAGGERATION:-0.5}
+      - CB_CFG_WEIGHT=${CB_CFG_WEIGHT:-0.5}
+      - USE_RUACCENT=${USE_RUACCENT:-1}
+      # Формат ответа /accent для приложения: mark (U+0301) | plus | strip.
+      - CB_STRESS_MODE=${CB_STRESS_MODE:-mark}
+      # Что скармливать модели: mark (U+0301 — формат, на котором Chatterbox
+      # обучен; ставится своим RUAccent) | plus | strip (без ударений).
+      - CB_SYNTH_STRESS=${CB_SYNTH_STRESS:-mark}
+      - CB_CHUNK_CHARS=${CB_CHUNK_CHARS:-300}
+      - MAX_TEXT_CHARS=${MAX_TEXT_CHARS:-5000}
+      # Веса ЗАПЕЧЕНЫ в образ при сборке (PREFETCH_MODEL=1) — том не нужен.
+      - HF_HOME=/opt/hf-cache
+      - HF_HUB_CACHE=/opt/hf-cache
+      - HF_HUB_OFFLINE=${CHATTERBOX_OFFLINE:-1}
+      - TRANSFORMERS_OFFLINE=${CHATTERBOX_OFFLINE:-1}
+    volumes:
+      # Эталоны голосов (.wav и т.п.) для клонирования — необязательны:
+      # у Chatterbox есть встроенный голос.
+      - ./voices:/app/voices
+    ports:
+      # Порт 8006 снаружи — рядом с XTTS (8002), Supertonic (8003),
+      # VoxCPM (8004), ESpeech (8005). В приложении — сменой адреса/пресета.
+      #   CHATTERBOX_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      - "${CHATTERBOX_BIND:-0.0.0.0}:8006:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
