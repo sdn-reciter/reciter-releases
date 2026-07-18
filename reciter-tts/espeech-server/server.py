@@ -9,7 +9,7 @@ import numpy as np
 import soundfile as sf
 
 # Метка версии server.py — печатается при старте и отдаётся в /health.
-SERVER_VERSION = "es-4 (2026-07-15: чанки ≤160 симв. — F5 глотала слова на длинных кусках)"
+SERVER_VERSION = "es-5 (2026-07-18: длинные предложения режем по клаузам — F5 глотала слова в середине)"
 
 from fastapi import FastAPI, Form, UploadFile, File, Header, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -338,10 +338,40 @@ def _tame_for_synth(t: str) -> str:
     return t
 
 
+# Клаузы внутри длинного предложения: запятая, точка с запятой, двоеточие,
+# тире. Одно предложение длиннее CHUNK_CHARS F5 всё равно читал целым куском и
+# глотал слова в середине (разбиение по предложениям его не спасало). Режем
+# такое предложение по клаузам — знак остаётся в конце клаузы, пауза и просодия
+# не теряются.
+_CLAUSE_SPLIT = re.compile(r"(?<=[,;:—])\s+")
+
+
+def _split_long(s: str):
+    if len(s) <= CHUNK_CHARS:
+        return [s]
+    parts = [p for p in _CLAUSE_SPLIT.split(s) if p.strip()]
+    if len(parts) <= 1:
+        return [s]  # нечего резать (нет клауз) — отдаём как есть
+    out, cur = [], ""
+    for p in parts:
+        if cur and len(cur) + len(p) + 1 > CHUNK_CHARS:
+            out.append(cur); cur = p
+        else:
+            cur = f"{cur} {p}".strip()
+    if cur:
+        out.append(cur)
+    return out
+
+
 def _chunks(text: str):
     sents = [s for s in _SENT_SPLIT.split(text) if s.strip() and _HAS_SPEECH.search(s)]
-    out, cur = [], ""
+    # Сначала разбиваем сверхдлинные предложения на клаузы, затем упаковываем
+    # предложения/клаузы в куски ≤ CHUNK_CHARS.
+    pieces = []
     for s in sents:
+        pieces.extend(_split_long(s))
+    out, cur = [], ""
+    for s in pieces:
         if cur and len(cur) + len(s) + 1 > CHUNK_CHARS:
             out.append(cur); cur = s
         else:

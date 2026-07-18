@@ -10,7 +10,7 @@ import soundfile as sf
 # при старте и отдаётся в /health, чтобы за секунду проверить, что в контейнере
 # крутится СВЕЖИЙ файл, а не старая копия. Если в docker-логе версия ниже —
 # обнови server.py на ПК и пересобери (docker compose up -d --build).
-SERVER_VERSION = "9 (2026-07-11: общая база reciter-tts-base, модель в томе /cache/tts)"
+SERVER_VERSION = "10 (2026-07-18: своё деление длинных предложений + «стоп» после тире/кавычек — меньше хвостовых артефактов)"
 
 # --- ПАТЧ 1: PYTORCH 2.6+ (weights_only=False) ---
 _orig_load = torch.load
@@ -284,15 +284,32 @@ def require_auth(authorization: Optional[str]):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
+_STOP_CHARS = ".!?…"
+# Закрывающие обёртки в конце реплики: точку-«стоп» ставим ПЕРЕД ними.
+_TRAILING_WRAP = "»”\"'）)]"
+
+
 def _ensure_stop(text: str) -> str:
     """Гарантирует финальный знак-«стоп». XTTS без терминальной пунктуации не
-    получает сигнала окончания и часто доклеивает посторонний звук. Добавляем
-    точку ТОЛЬКО когда фраза заканчивается буквой/цифрой — существующую
-    пунктуацию (?, !, …, », кавычки, тире) не трогаем."""
+    получает сигнала окончания и доклеивает посторонний звук в конце фразы.
+    Раньше точка добавлялась ТОЛЬКО после буквы/цифры — а реплики, кончающиеся
+    на тире «—», двоеточие или закрывающую кавычку «»» (сплошь и рядом в
+    русских диалогах), оставались без «стоп»-сигнала и давали хвостовой
+    артефакт. Теперь точку ставим всегда, когда последний ЗНАЧИМЫЙ символ (без
+    учёта закрывающих кавычек/скобок) не является терминатором."""
     t = (text or "").rstrip()
-    if t and t[-1].isalnum():
-        t += "."
-    return t
+    if not t:
+        return t
+    j = len(t) - 1
+    while j >= 0 and t[j] in _TRAILING_WRAP:
+        j -= 1
+    if j < 0:
+        return t  # одни кавычки/скобки — не трогаем
+    if t[j] in _STOP_CHARS:
+        return t  # «стоп» уже есть (в т.ч. перед закрывающей кавычкой)
+    # Тире/двоеточие/запятая или буква/цифра в конце — чёткого «стоп» нет.
+    # Точку вставляем перед закрывающими кавычками, если они есть.
+    return t[:j + 1] + "." + t[j + 1:]
 
 
 def _xtts_gen_kwargs() -> dict:
@@ -348,22 +365,21 @@ def _get_latents(speaker_wav: str):
 
 
 def _synth_one(text: str, speaker_wav: str, language: str):
-    """Синтез ОДНОГО предложения → np.float32. Основной путь —
-    model.inference() с кэшированными латентами (быстрее и с полным контролем
-    параметров); если внутренний API этой версии TTS иной — откат на
-    публичный tts.tts()."""
+    """Синтез ОДНОГО куска (предложение/клауза ≤ лимита) → np.float32. Основной
+    путь — model.inference() с кэшированными латентами (быстрее и с полным
+    контролем параметров); если внутренний API этой версии TTS иной — откат на
+    публичный tts.tts().
+
+    enable_text_splitting=False намеренно: длинные предложения мы дробим САМИ
+    (см. _split_long) и чистим хвост КАЖДОГО куска через _postprocess. С True
+    XTTS резал предложение внутри себя и склеивал подкуски БЕЗ очистки их
+    хвостов — отсюда «артефакты после предложения»."""
     try:
         model = tts.synthesizer.tts_model
         gpt_cond, spk_emb = _get_latents(speaker_wav)
-        # enable_text_splitting=True ОБЯЗАТЕЛЕН: у XTTS жёсткий лимит ~182
-        # символа на проход — предложение длиннее просто обрезается по звуку
-        # («The text length exceeds the character limit of 182» в логе).
-        # True дробит длинное предложение на куски внутри модели и склеивает.
-        # Наше внешнее деление по предложениям остаётся — оно нужно для
-        # пост-обработки хвостов; True здесь страхует длинные предложения.
         out = model.inference(
             text, language, gpt_cond, spk_emb,
-            enable_text_splitting=True,
+            enable_text_splitting=False,
             **_xtts_gen_kwargs(),
         )
         return np.asarray(out["wav"], dtype=np.float32).flatten()
@@ -389,6 +405,44 @@ _HAS_SPEECH = re.compile(r"[^\W_]", re.UNICODE)
 
 def _has_speech(text: str) -> bool:
     return bool(_HAS_SPEECH.search(text or ""))
+
+
+# У XTTS жёсткий лимит ~182 символа на проход: предложение длиннее просто
+# обрезается по звуку («The text length exceeds the character limit of 182»).
+# Раньше это страховал внутренний сплиттер модели (enable_text_splitting=True),
+# но он склеивал подкуски без очистки их хвостов. Теперь длинные предложения
+# режем САМИ и синтезируем/чистим каждый кусок отдельно.
+XTTS_MAX_CHARS = _envi("XTTS_MAX_CHARS", 180)
+_CLAUSE_SPLIT = re.compile(r"(?<=[,;:—])\s+")
+
+
+def _pack(parts, limit):
+    out, cur = [], ""
+    for p in parts:
+        if cur and len(cur) + len(p) + 1 > limit:
+            out.append(cur); cur = p
+        else:
+            cur = f"{cur} {p}".strip()
+    if cur:
+        out.append(cur)
+    return out
+
+
+def _split_long(s: str):
+    """Предложение ≤ лимита — как есть. Длиннее — режем по клаузам
+    (запятая/тире/двоеточие), а неделимо-длинную клаузу — по словам (крайняя
+    мера, чтобы не превысить лимит XTTS)."""
+    if len(s) <= XTTS_MAX_CHARS:
+        return [s]
+    clauses = [p for p in _CLAUSE_SPLIT.split(s) if p.strip()]
+    packed = _pack(clauses, XTTS_MAX_CHARS) if len(clauses) > 1 else [s]
+    out = []
+    for c in packed:
+        if len(c) <= XTTS_MAX_CHARS:
+            out.append(c)
+        else:
+            out.extend(_pack(c.split(), XTTS_MAX_CHARS))
+    return out
 
 
 def _postprocess(audio, sr: int):
@@ -461,11 +515,15 @@ def synthesize(text: str, speaker_wav_path: str = None, language: str = "ru"):
         buf.seek(0)
         return buf
     if speaker:
-        # По предложению за проход: у каждого чистится свой хвост, склейка
-        # через фиксированную паузу — артефакты между предложениями исчезают.
-        chunks = []
+        # По куску за проход (предложение или его клауза ≤ лимита XTTS): у
+        # каждого чистится свой хвост, склейка через фиксированную паузу —
+        # артефакты после предложений и внутри длинных предложений исчезают.
+        pieces = []
         for s in sentences:
-            a = _synth_one(_ensure_stop(s.strip()), speaker, language)
+            pieces.extend(_split_long(s.strip()))
+        chunks = []
+        for p in pieces:
+            a = _synth_one(_ensure_stop(p.strip()), speaker, language)
             chunks.append(_postprocess(a, SAMPLE_RATE))
         pause = np.zeros(int(SAMPLE_RATE * SENT_PAUSE_MS / 1000.0), dtype=np.float32)
         audio = chunks[0]
