@@ -9,8 +9,7 @@ Supertonic, VoxCPM, ESpeech/F5, Piper, что угодно) — приложен
 [`xtts-server`](xtts-server/README.md) · [`supertonic-server`](supertonic-server/README.md) ·
 [`voxcpm-server`](voxcpm-server/README.md) · [`espeech-server`](espeech-server/README.md) ·
 [`chatterbox-server`](chatterbox-server/README.md) · [`cosyvoice-server`](cosyvoice-server/README.md).
-Развёртывание и безопасный доступ снаружи — в
-[`self-hosted-server.md`](self-hosted-server.md) и [`remote-access.md`](remote-access.md).
+Обзор, запуск и доступ снаружи (Tailscale) — в [`README.md`](README.md).
 
 > Функция «Свой сервер» доступна во **всех сборках** (dev и prod). В
 > приложении: «Параметры → Чтение вслух → движок “Свой сервер”», адрес и

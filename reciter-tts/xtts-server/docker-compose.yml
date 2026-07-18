@@ -26,7 +26,7 @@ services:
       # Кастомная модель XTTS (файнтюн): положи model.pth/config.json/vocab.json
       # в ./model и поставь XTTS_MODEL_DIR=/app/model в .env.
       - XTTS_MODEL_DIR=${XTTS_MODEL_DIR:-}
-      # ── Анти-артефакты (см. self-hosted-server.md §5a) ───────────────────
+      # ── Анти-артефакты (см. README.md «Странные звуки в конце фраз») ──────
       - XTTS_REPETITION_PENALTY=${XTTS_REPETITION_PENALTY:-6.0}
       - XTTS_TEMPERATURE=${XTTS_TEMPERATURE:-0.7}
       - XTTS_TOP_K=${XTTS_TOP_K:-50}
@@ -52,9 +52,9 @@ services:
       # По умолчанию порт открыт в ЛОКАЛЬНОЙ СЕТИ (0.0.0.0), чтобы телефон в той
       # же Wi-Fi достучался до http://<IP-ПК>:8002 — это и есть первый сценарий
       # («сначала тест по Wi-Fi»). Переопределить можно через .env:
-      #   XTTS_BIND=127.0.0.1   → только localhost (когда сервер за Caddy/VPN).
-      # ⚠️ Не пробрасывайте 8002 «в мир» на роутере без HTTPS и ключа —
-      #    для интернета используйте Tailscale/Caddy (см. self-hosted-server.md).
+      #   XTTS_BIND=127.0.0.1   → только localhost (когда сервер за VPN).
+      # ⚠️ Не пробрасывайте 8002 «в мир» на роутере — для доступа снаружи
+      #    используйте Tailscale (см. ../README.md).
       - "${XTTS_BIND:-0.0.0.0}:8002:8002"
     deploy:
       resources:

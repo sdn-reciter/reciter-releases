@@ -37,7 +37,7 @@ services:
     ports:
       # Порт 8006 снаружи — рядом с XTTS (8002), Supertonic (8003),
       # VoxCPM (8004), ESpeech (8005). В приложении — сменой адреса/пресета.
-      #   CHATTERBOX_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      #   CHATTERBOX_BIND=127.0.0.1 → только localhost (за VPN).
       - "${CHATTERBOX_BIND:-0.0.0.0}:8006:8002"
     deploy:
       resources:

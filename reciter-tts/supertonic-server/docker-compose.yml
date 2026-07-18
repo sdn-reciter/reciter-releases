@@ -31,7 +31,7 @@ services:
     ports:
       # Порт 8003 снаружи — чтобы работать РЯДОМ с XTTS-сервером (8002) и
       # переключаться в приложении простой сменой адреса.
-      #   SUPERTONIC_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      #   SUPERTONIC_BIND=127.0.0.1 → только localhost (за VPN).
       - "${SUPERTONIC_BIND:-0.0.0.0}:8003:8002"
     deploy:
       resources:

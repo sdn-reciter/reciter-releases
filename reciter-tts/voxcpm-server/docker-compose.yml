@@ -56,7 +56,7 @@ services:
     ports:
       # Порт 8004 снаружи — рядом с XTTS (8002) и Supertonic (8003);
       # в приложении переключение простой сменой адреса.
-      #   VOXCPM_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      #   VOXCPM_BIND=127.0.0.1 → только localhost (за VPN).
       - "${VOXCPM_BIND:-0.0.0.0}:8004:8002"
     deploy:
       resources:

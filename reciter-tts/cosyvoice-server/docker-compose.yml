@@ -28,7 +28,7 @@ services:
       - ./voices:/app/voices
     ports:
       # Порт 8007 снаружи — рядом с XTTS/Supertonic/VoxCPM/ESpeech/Chatterbox.
-      #   COSYVOICE_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      #   COSYVOICE_BIND=127.0.0.1 → только localhost (за VPN).
       - "${COSYVOICE_BIND:-0.0.0.0}:8007:8002"
     deploy:
       resources:

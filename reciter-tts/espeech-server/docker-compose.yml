@@ -43,7 +43,7 @@ services:
     ports:
       # Порт 8005 снаружи — рядом с XTTS (8002), Supertonic (8003),
       # VoxCPM (8004); в приложении переключение сменой адреса/пресета.
-      #   ESPEECH_BIND=127.0.0.1 → только localhost (за Caddy/VPN).
+      #   ESPEECH_BIND=127.0.0.1 → только localhost (за VPN).
       - "${ESPEECH_BIND:-0.0.0.0}:8005:8002"
     deploy:
       resources:

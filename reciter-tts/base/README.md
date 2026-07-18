@@ -1,24 +1,26 @@
 # reciter-tts-base — общий базовый образ TTS-серверов
 
-Всё тяжёлое и одинаковое для XTTS / Supertonic / VoxCPM собрано в один
-базовый образ: CUDA runtime, torch/torchaudio (cu128, RTX 50xx) + torchcodec,
-FastAPI-стек, RUAccent с прогретой моделью ударений.
+Всё тяжёлое и одинаковое для всех движков собрано в один базовый образ: CUDA
+runtime, torch/torchaudio (cu128, RTX 50xx) + torchcodec, FastAPI-стек, RUAccent
+с прогретой моделью ударений.
 
-Зачем: слои базы у Docker общие для всех движковых образов — место на диске
-не умножается на три, а пересборка любого движка занимает минуты (база не
-пересобирается).
+Зачем: слои базы у Docker общие для всех движковых образов — место на диске не
+умножается, а пересборка любого движка занимает минуты (база не пересобирается).
 
 ## Структура на ПК
 
-Все TTS-серверы живут в одной папке `/mnt/data/reciter-tts` — зеркало
-`docs/reciter-tts/` из репозитория:
+Все TTS-серверы живут в одной папке `/mnt/data/reciter-tts` — копия папки
+`reciter-tts/`:
 
 ```
 /mnt/data/reciter-tts/
 ├── base/                # этот базовый образ
 ├── xtts-server/         # :8002
 ├── supertonic-server/   # :8003
-└── voxcpm-server/       # :8004
+├── voxcpm-server/       # :8004
+├── espeech-server/      # :8005
+├── chatterbox-server/   # :8006
+└── cosyvoice-server/    # :8007
 ```
 
 ## Порядок сборки
@@ -28,20 +30,18 @@ FastAPI-стек, RUAccent с прогретой моделью ударений
 cd /mnt/data/reciter-tts/base
 docker build -t reciter-tts-base:cu128 .
 
-# 2. Движки — каждый в своей папке, обычным compose
-cd ../xtts-server       && docker compose build && docker compose up -d   # :8002
-cd ../supertonic-server && docker compose build && docker compose up -d   # :8003
-cd ../voxcpm-server     && docker compose build && docker compose up -d   # :8004
+# 2. Любой движок — в своей папке, обычным compose (пример: XTTS)
+cd ../xtts-server && cp .env.example .env && docker compose up -d --build   # :8002
 ```
 
 Движковые Dockerfile начинаются с `FROM reciter-tts-base:cu128` — если базы
 нет локально, сборка сразу скажет об этом.
 
-## Модели — в томах, не в образах
+## Модели
 
-Веса моделей (XTTS ~2 ГБ, Supertonic ~0.4 ГБ, VoxCPM ~2 ГБ) качаются при
-ПЕРВОМ старте контейнера в `./cache` (том) и переживают пересборки образов.
-Образы движков остаются тонкими (только pip-зависимости движка).
+Веса качаются либо при первом старте в том `./cache` (XTTS/Supertonic/VoxCPM),
+либо запекаются в образ при сборке (ESpeech/Chatterbox/CosyVoice) — зависит от
+движка, см. его README. В обоих случаях образ пересобирается быстро.
 
 ## Обновление torch
 
