@@ -18,7 +18,7 @@ services:
       - USE_RUACCENT=1
       - MAX_TEXT_CHARS=5000
       # ── Ударения: форматы ────────────────────────────────────────────────
-      # /accent для внешних движков (Edge/Google понимают U+0301):
+      # /accent для движков, читающих метки U+0301:
       - XTTS_STRESS_MODE=${XTTS_STRESS_MODE:-mark}
       # вход САМОЙ XTTS: strip (базовая модель ударений не понимает) |
       # plus (для русских файнтюнов типа xttsv2_banana, вместе с XTTS_MODEL_DIR)
