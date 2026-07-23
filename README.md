@@ -7,18 +7,18 @@ Android-приложение для чтения электронных книг
 ## Скриншоты
 
 <!-- Скриншоты кладите в папку screenshots/ этого репозитория с этими именами
-     (портрет, .png). Пустые слоты просто не отобразятся, пока нет файла. -->
+     (портрет, .jpg). Пустые слоты просто не отобразятся, пока нет файла. -->
 
 <table>
   <tr>
-    <td width="33%" align="center"><img src="screenshots/library.png" alt="Библиотека"><br><sub>Библиотека</sub></td>
-    <td width="33%" align="center"><img src="screenshots/reader.png" alt="Читалка"><br><sub>Читалка</sub></td>
-    <td width="33%" align="center"><img src="screenshots/tts.png" alt="Озвучка"><br><sub>Озвучка с подсветкой</sub></td>
+    <td width="33%" align="center"><img src="screenshots/library.jpg" alt="Библиотека"><br><sub>Библиотека</sub></td>
+    <td width="33%" align="center"><img src="screenshots/reader.jpg" alt="Читалка"><br><sub>Читалка</sub></td>
+    <td width="33%" align="center"><img src="screenshots/tts.jpg" alt="Озвучка"><br><sub>Озвучка с подсветкой</sub></td>
   </tr>
   <tr>
-    <td width="33%" align="center"><img src="screenshots/themes.png" alt="Оформление"><br><sub>Темы и оформление</sub></td>
-    <td width="33%" align="center"><img src="screenshots/settings.png" alt="Параметры"><br><sub>Параметры</sub></td>
-    <td width="33%" align="center"><img src="screenshots/game.png" alt="Мини-игра"><br><sub>Мини-игра во время прослушивания</sub></td>
+    <td width="33%" align="center"><img src="screenshots/themes.jpg" alt="Оформление"><br><sub>Темы и оформление</sub></td>
+    <td width="33%" align="center"><img src="screenshots/settings.jpg" alt="Параметры"><br><sub>Параметры</sub></td>
+    <td width="33%" align="center"><img src="screenshots/game.jpg" alt="Мини-игра"><br><sub>Мини-игра во время прослушивания</sub></td>
   </tr>
 </table>
 
