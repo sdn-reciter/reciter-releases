@@ -2,29 +2,11 @@
   "version": 1,
   "themes": [
     {
-      "id": "amber",
-      "name": "Ночной янтарь",
-      "file": "amber.zip",
-      "size": 1905132,
-      "hash": "75125ebdc31ec745",
-      "author": "Reciter",
-      "preview": "amber.jpg"
-    },
-    {
-      "id": "naruto",
-      "name": "Наруто",
-      "file": "naruto.zip",
-      "size": 3312768,
-      "hash": "4cf91edc6299fd90",
-      "author": "Reciter",
-      "preview": "naruto.jpg"
-    },
-    {
       "id": "naruto-day",
       "name": "Наруто. День",
       "file": "naruto-day.zip",
-      "size": 2107848,
-      "hash": "35716ab615228415",
+      "size": 2107842,
+      "hash": "aa53e72c3633ba9c",
       "author": "Reciter",
       "preview": "naruto-day.jpg"
     }
