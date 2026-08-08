@@ -2,13 +2,13 @@
   "version": 1,
   "themes": [
     {
-      "id": "naruto-day",
-      "name": "Наруто. День",
-      "file": "naruto-day.zip",
-      "size": 2107858,
-      "hash": "8290280e480192e4",
+      "id": "shinobi-day",
+      "name": "Шиноби. День",
+      "file": "shinobi-day.zip",
+      "size": 2107856,
+      "hash": "50441efb4fb13298",
       "author": "Reciter",
-      "preview": "naruto-day.jpg"
+      "preview": "shinobi-day.jpg"
     }
   ]
 }
