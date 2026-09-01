@@ -78,6 +78,67 @@ grep API_KEY /mnt/data/reciter-tts/xtts-server/.env
 Сменить ключ — впишите новое значение в `.env`, `docker compose up -d
 --force-recreate`, и обновите его в приложении.
 
+## Docker не видит видеокарту
+
+```
+Error response from daemon: could not select device driver "nvidia" with capabilities: [[gpu]]
+```
+
+Драйвер видеокарты тут ни при чём: так Docker сообщает, что у него не
+подключён NVIDIA Container Toolkit — прослойка, которая пробрасывает карту
+внутрь контейнера. Чаще всего это вылезает после обновления Docker или
+драйвера, когда настройка слетела. Проверять по порядку:
+
+```bash
+nvidia-smi                      # 1. карту видит сама система?
+nvidia-ctk --version            # 2. прослойка установлена?
+docker info | grep -i runtime   # 3. Docker про неё знает? (нужна строка nvidia)
+```
+
+1. Если `nvidia-smi` ругается на несовпадение версий драйвера и библиотеки —
+   систему после обновления не перезагружали; перезагрузка лечит.
+2. Если `nvidia-ctk` не найден — прослойки нет (или её снёс `apt autoremove`,
+   оставив запись о рантайме в настройках Docker). Ставится из репозитория
+   NVIDIA, на Ubuntu/Debian:
+
+```bash
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+  | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+  | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#' \
+  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+```
+
+3. Зарегистрировать прослойку и перезапустить демон:
+
+```bash
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+docker run --rm --gpus all reciter-tts-base:cu128 nvidia-smi   # карта видна из контейнера
+```
+
+Последняя команда должна напечатать таблицу `nvidia-smi`. После неё
+`docker compose up -d` поднимается как обычно.
+
+Отдельный случай — ошибка про CDI:
+
+```
+failed to discover GPU vendor from CDI: no known GPU vendor found
+```
+
+Docker с версии 28 ищет карту через CDI — описание устройства, которое
+генерирует та же прослойка и в котором записаны версии библиотек драйвера.
+Файла нет или он остался от прежнего драйвера; пересоздать и проверить:
+
+```bash
+sudo nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+nvidia-ctk cdi list          # должен появиться nvidia.com/gpu=all
+```
+
+Описание привязано к версии драйвера, поэтому после каждого его обновления
+команду повторяют.
+
 ## Подключение в приложении
 
 «Параметры → Чтение вслух → движок **«Свой сервер»**»:
