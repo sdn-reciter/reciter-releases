@@ -25,6 +25,8 @@
   .tagline { color: var(--muted); font-size: 1.1rem; margin: 0; }
   .cta { display: inline-block; margin-top: 24px; padding: 12px 28px; border-radius: 10px;
          background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; }
+  .cta:hover { filter: brightness(1.1); }
+  a:focus-visible, .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
   h2 { font-size: 1.35rem; margin: 40px 0 12px; }
   ul { padding-left: 20px; }
   li { margin: 6px 0; }
@@ -39,7 +41,7 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<main class="wrap">
   <header>
     <h1>Reciter Книги</h1>
     <p class="tagline">Приложение для Android, которое читает ваши электронные книги вслух</p>
@@ -55,17 +57,17 @@
     <p>Приложение использует ваш <strong>аккаунт Google</strong> для входа, а ваш
        <strong>Google Диск</strong> — чтобы хранить вашу личную библиотеку, прогресс
        чтения и настройки и синхронизировать их между вашими устройствами. Данные
-       остаются в вашем аккаунте: у приложения нет своего сервера, который собирал бы
-       эту информацию. Вместо Google Диска можно использовать Яндекс.Диск.</p>
+       остаются в вашем аккаунте: у приложения нет своего сервера, который хранил бы
+       вашу библиотеку. Поддерживаются Google Диск и Яндекс.Диск.</p>
   </section>
 
   <section>
     <h2>Возможности</h2>
     <div class="grid">
       <div class="card"><h3>Синхронизация через ваше облако</h3><p>Книги и прогресс — в вашем Google Диске или Яндекс.Диске. Данные разных аккаунтов раздельны.</p></div>
-      <div class="card"><h3>Продвинутый TTS</h3><p>Системный голос Android или собственный голосовой сервер, подсветка читаемого слова, чтение сносок, словарь ударений.</p></div>
+      <div class="card"><h3>Озвучка</h3><p>Системный голос Android или собственный голосовой сервер, подсветка читаемого слова, чтение сносок, словарь ударений.</p></div>
       <div class="card"><h3>Умная библиотека</h3><p>Автогруппировка по авторам и сериям, шкафы, закладки, оглавление, поиск и фильтры.</p></div>
-      <div class="card"><h3>Переводчик и ИИ-парсер</h3><p>Офлайн-перевод книг и умное выделение глав в плохо размеченных файлах.</p></div>
+      <div class="card"><h3>Переводчик и разбор глав</h3><p>Перевод книг и умное выделение глав в плохо размеченных файлах — всё на самом устройстве.</p></div>
       <div class="card"><h3>Внешний вид</h3><p>Две дизайн-системы, набор тем и пользовательские цвета, гибкая типографика.</p></div>
       <div class="card"><h3>Отдых</h3><p>Мини-игры прямо в читалке, чтобы отвлечься во время прослушивания.</p></div>
     </div>
@@ -85,6 +87,6 @@
     <p>Обратная связь: <a href="https://github.com/sdn-reciter/reciter-releases/issues">GitHub Issues</a>
        · <a href="mailto:sdn.pty@gmail.com">sdn.pty@gmail.com</a></p>
   </footer>
-</div>
+</main>
 </body>
 </html>
