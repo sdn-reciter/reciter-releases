@@ -870,7 +870,7 @@ json читаются в UTF-8 везде одинаково, а имена фа
 
   "dark": {
     "colors": { "background": "#1C1712", "text": "#EDE0C8", "accent": "#E2661A" },
-    "background": { "type": "gradient", "gradient0": "#1C1712", "gradient1": "#0F0C09" },
+    "background": { "type": "gradient", "colors": ["#1C1712", "#0F0C09"] },
     "images": { "appBackground": "", "sheet": "" },
     "icons":  { "search": "ic_search_night.png" }
   }
