@@ -662,7 +662,7 @@
 | `icons` | `filterUnfinishedSeries` | фильтр «Незаконченные серии» | `ic_filter_series.png` | png 256×256 |
 | `icons` | `filterPaused` | фильтр «Отложенные» | `ic_filter_paused.png` | png 256×256 |
 | `icons` | `emptyLibrary` | значок на экране пустой библиотеки | `ic_empty.png` | png 256×256 |
-| `icons` | `shelf` | полка: карточка, метка на обложке, пустой список полок | `ic_shelf.png` | png 256×256 |
+| `icons` | `shelf` | полка: карточка, метка на обложке, пустой список полок, кнопка «Создать полку» | `ic_shelf.png` | png 256×256 |
 | `icons` | `author` | карточка автора, если не задан `authorIcons` | `ic_author.png` | png 256×256, рисунок во всю плитку |
 | `icons` | `groupArrow` | стрелка перехода в карточках полок, серий, авторов | `ic_arrow.png` | png 256×256 |
 | `icons` | `coverPlaceholder` | значок на месте отсутствующей обложки | `ic_cover.png` | png 256×256 |

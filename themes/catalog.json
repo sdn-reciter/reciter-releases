@@ -5,8 +5,17 @@
       "id": "shinobi-day",
       "name": "Шиноби. День",
       "file": "theme.zip",
-      "size": 2107856,
-      "hash": "50441efb4fb13298",
+      "size": 2114848,
+      "hash": "18138ee4a6fefd60",
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "shinobi-night",
+      "name": "Шиноби. Ночь",
+      "file": "theme.zip",
+      "size": 1816349,
+      "hash": "1f813f94fe8039bd",
       "author": "Reciter",
       "preview": "preview.jpg"
     }
