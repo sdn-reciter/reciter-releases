@@ -1,0 +1,52 @@
+# CPU-вариант (хост без NVIDIA GPU / без nvidia-container-toolkit):
+#   docker compose -f docker-compose.cpu.yml up -d
+# Тот же образ; отличие — DEVICE=cpu и нет резервирования GPU.
+services:
+  voxcpm:
+    build:
+      context: .
+      args:
+        MODEL: ${VOXCPM_MODEL:-openbmb/VoxCPM-0.5B}
+        FULL_MODEL: ${VOXCPM_FULL_MODEL:-openbmb/VoxCPM2}
+        PREFETCH_MODEL: ${PREFETCH_MODEL:-1}
+    container_name: voxcpm
+    restart: unless-stopped
+    environment:
+      - API_KEY=${VOXCPM_API_KEY:-}
+      - MODEL=${VOXCPM_MODEL:-}
+      - VOXCPM_FULL_MODEL=${VOXCPM_FULL_MODEL:-openbmb/VoxCPM2}
+      - DEVICE=cpu
+      - DEFAULT_SPEAKER=${VOXCPM_DEFAULT_SPEAKER:-}
+      - USE_RUACCENT=${USE_RUACCENT:-1}
+      - VOXCPM_STRESS_MODE=${VOXCPM_STRESS_MODE:-mark}
+      - VOXCPM_SYNTH_STRESS=${VOXCPM_SYNTH_STRESS:-strip}
+      - VOXCPM_CFG=${VOXCPM_CFG:-2.0}
+      # На CPU можно уменьшить шаги (например 6) — быстрее ценой качества.
+      - VOXCPM_TIMESTEPS=${VOXCPM_TIMESTEPS:-10}
+      # Референс длиннее REF_MAX_SEC режется (иначе VAE-кодирование эталона
+      # даёт CUDA OOM на 8-ГБ карте). Фиксированный SEED — стабильный голос.
+      - VOXCPM_REF_MAX_SEC=${VOXCPM_REF_MAX_SEC:-12}
+      - VOXCPM_SEED=${VOXCPM_SEED:-42}
+      # Экономия VRAM: денойзер и CUDA-графы можно выключить (0) на маленькой карте.
+      - VOXCPM_DENOISER=${VOXCPM_DENOISER:-0}
+      - VOXCPM_OPTIMIZE=${VOXCPM_OPTIMIZE:-0}
+      # На CPU порог не влияет, но держим тот же дефолт для единого .env.
+      - VOXCPM_FULL_MIN_VRAM_GB=${VOXCPM_FULL_MIN_VRAM_GB:-7}
+      - VOXCPM_ALLOW_FULL_ON_LOW_VRAM=${VOXCPM_ALLOW_FULL_ON_LOW_VRAM:-0}
+      # Против фрагментации VRAM (см. ошибку CUDA OOM в логах).
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+      - VOXCPM_SENT_PAUSE_MS=${VOXCPM_SENT_PAUSE_MS:-200}
+      - VOXCPM_CHUNK_CHARS=${VOXCPM_CHUNK_CHARS:-400}
+      - MAX_TEXT_CHARS=${MAX_TEXT_CHARS:-5000}
+      # Веса ЗАПЕЧЕНЫ в образ при сборке (PREFETCH_MODEL=1), лежат в
+      # /opt/hf-cache — том для них не нужен, на старте скачивания нет.
+      - HF_HOME=/opt/hf-cache
+      - HF_HUB_CACHE=/opt/hf-cache
+      - HF_HUB_OFFLINE=${VOXCPM_OFFLINE:-1}
+      - TRANSFORMERS_OFFLINE=${VOXCPM_OFFLINE:-1}
+    volumes:
+      # Тонкий образ (--build-arg PREFETCH_MODEL=0): раскомментируйте.
+      # - ./cache:/opt/hf-cache
+      - ./voices:/app/voices
+    ports:
+      - "${VOXCPM_BIND:-0.0.0.0}:8004:8002"

@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "gazeta",
+      "name": "Газета",
+      "file": "theme.zip",
+      "size": 3028353,
+      "hash": "765101c3b3a6fea7",
+      "names": {
+        "en": "Newspaper"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "krupno",
+      "name": "Крупно и чётко",
+      "file": "theme.zip",
+      "size": 35102,
+      "hash": "5ac1208839bebaad",
+      "names": {
+        "en": "Large Print"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "shinobi",
+      "name": "Шиноби",
+      "file": "theme.zip",
+      "size": 2675369,
+      "hash": "f297a026eb312049",
+      "names": {
+        "en": "Shinobi"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    }
+  ]
+}

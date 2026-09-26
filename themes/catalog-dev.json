@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "dnevnik",
+      "name": "Дневник",
+      "file": "theme.zip",
+      "size": 2378049,
+      "hash": "3d4caacdf06cafda",
+      "names": {
+        "en": "Journal"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "focus",
+      "name": "Фокус",
+      "file": "theme.zip",
+      "size": 160372,
+      "hash": "c7fa019ca03faf48",
+      "names": {
+        "en": "Focus"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "krupno2",
+      "name": "Крупно и чётко 2",
+      "file": "theme.zip",
+      "size": 441509,
+      "hash": "2cefbc5916c32bbc",
+      "names": {
+        "en": "Large Print 2"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "quest",
+      "name": "Квест",
+      "file": "theme.zip",
+      "size": 301379,
+      "hash": "597708a92e20968a",
+      "names": {
+        "en": "Quest"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    }
+  ]
+}
