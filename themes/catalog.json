@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "dnevnik",
+      "name": "Дневник",
+      "file": "theme.zip",
+      "size": 2378057,
+      "hash": "e959c9ece6a4f85a",
+      "names": {
+        "en": "Journal"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "focus",
+      "name": "Фокус",
+      "file": "theme.zip",
+      "size": 160372,
+      "hash": "c7fa019ca03faf48",
+      "names": {
+        "en": "Focus"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "gazeta",
+      "name": "Газета",
+      "file": "theme.zip",
+      "size": 3028353,
+      "hash": "765101c3b3a6fea7",
+      "names": {
+        "en": "Newspaper"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "krupno",
+      "name": "Крупно и чётко",
+      "file": "theme.zip",
+      "size": 35110,
+      "hash": "21f2e22ad60be39a",
+      "names": {
+        "en": "Large Print"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "quest",
+      "name": "Квест",
+      "file": "theme.zip",
+      "size": 276956,
+      "hash": "5e7bed209d338681",
+      "names": {
+        "en": "Quest"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "shinobi",
+      "name": "Шиноби",
+      "file": "theme.zip",
+      "size": 2675369,
+      "hash": "f297a026eb312049",
+      "names": {
+        "en": "Shinobi"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    }
+  ]
+}
