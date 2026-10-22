@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "astrolabe",
+      "name": "Астролябия",
+      "file": "astrolabe.zip",
+      "size": 5803184,
+      "hash": "a3b305be2e4b289d",
+      "names": {
+        "en": "Astrolabe"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "cyberdeck",
+      "name": "Кибердек",
+      "file": "cyberdeck.zip",
+      "size": 4740338,
+      "hash": "cc6882fdd1765a77",
+      "names": {
+        "en": "Cyberdeck"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "dnevnik",
+      "name": "Дневник",
+      "file": "dnevnik.zip",
+      "size": 2400286,
+      "hash": "80a66a9a3b5787a6",
+      "names": {
+        "en": "Journal"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "focus",
+      "name": "Фокус",
+      "file": "focus.zip",
+      "size": 160372,
+      "hash": "c7fa019ca03faf48",
+      "names": {
+        "en": "Focus"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "gazeta",
+      "name": "Газета",
+      "file": "gazeta.zip",
+      "size": 3047950,
+      "hash": "595c8a460be3ddb0",
+      "names": {
+        "en": "Newspaper"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "krupno",
+      "name": "Крупно и чётко",
+      "file": "krupno.zip",
+      "size": 35110,
+      "hash": "21f2e22ad60be39a",
+      "names": {
+        "en": "Large Print"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "quest",
+      "name": "Квест",
+      "file": "quest.zip",
+      "size": 283927,
+      "hash": "efee8fd5042dd1e3",
+      "names": {
+        "en": "Quest"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "shinobi",
+      "name": "Шиноби",
+      "file": "shinobi.zip",
+      "size": 5150988,
+      "hash": "c5c2755448dc6928",
+      "names": {
+        "en": "Shinobi"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    }
+  ]
+}
