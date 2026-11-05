@@ -1,0 +1,25 @@
+services:
+  confucius4:
+    build: .
+    container_name: confucius4
+    restart: unless-stopped
+    environment:
+      - API_KEY=${CONFUCIUS_API_KEY:-}
+      - DEFAULT_SPEAKER=${CONFUCIUS_DEFAULT_SPEAKER:-}
+      - REF_MAX_SEC=${CONFUCIUS_REF_MAX_SEC:-12}
+      - PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+      - HF_HUB_OFFLINE=1
+      - TRANSFORMERS_OFFLINE=1
+    volumes:
+      # Эталоны голосов (.wav) для клонирования.
+      - ./voices:/app/voices
+    ports:
+      # Порт 8008 снаружи — рядом с остальными серверами.
+      - "${CONFUCIUS_BIND:-0.0.0.0}:8008:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
