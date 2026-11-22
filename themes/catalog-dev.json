@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "amoled",
+      "name": "Полночь и полдень",
+      "file": "amoled.zip",
+      "size": 738019,
+      "hash": "47f4af3c4d4dcc06",
+      "names": {
+        "en": "Midnight & Noon"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    }
+  ]
+}
