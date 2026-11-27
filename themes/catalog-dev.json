@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "orangerie",
+      "name": "Оранжерея",
+      "file": "orangerie.zip",
+      "size": 5962467,
+      "hash": "fea3819acc5f587e",
+      "names": {
+        "en": "Conservatory"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    },
+    {
+      "id": "story-orbit",
+      "name": "Орбита историй",
+      "file": "story-orbit.zip",
+      "size": 959104,
+      "hash": "d76901d590d0591c",
+      "names": {
+        "en": "Story Orbit"
+      },
+      "author": "Reciter",
+      "preview": "preview.jpg"
+    }
+  ]
+}
